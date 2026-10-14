@@ -7,23 +7,41 @@ import java.sql.SQLException;
 
 public class UserDAO {
 
-    public static boolean authenticateUser(String username, String password, String role) {
-        String sql = "SELECT * FROM users WHERE username = ? AND password = ? AND role = ?";
-
+    // Authenticate Student
+    public static boolean authenticateStudent(String admissionNo, String password) {
+        String sql = "SELECT password_hash FROM students WHERE admission_no = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            stmt.setString(3, role);
+            stmt.setString(1, admissionNo);
+            ResultSet rs = stmt.executeQuery();
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next(); // Returns true if a match is found
+            if (rs.next()) {
+                String storedPassword = rs.getString("password_hash");
+                return password.equals(storedPassword);
             }
-
         } catch (SQLException e) {
-            System.err.println("❌ Auth Error: " + e.getMessage());
-            return false;
+            e.printStackTrace();
         }
+        return false;
+    }
+
+    // Authenticate Admin
+    public static boolean authenticateAdmin(String adminId, String password) {
+        String sql = "SELECT password_hash FROM admin WHERE admin_id = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, adminId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String storedPassword = rs.getString("password_hash");
+                return password.equals(storedPassword);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

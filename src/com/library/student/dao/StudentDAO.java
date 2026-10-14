@@ -1,11 +1,15 @@
 package com.library.student.dao;
-
 import com.library.student.model.Book;
 import com.library.student.model.BorrowRecord;
-import java.sql.*;
-import java.util.ArrayList;
+import com.library.dao.DatabaseManager;
+import com.library.student.model.Student;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
-
+import java.util.ArrayList;
 public class StudentDAO {
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:mysql://localhost:3306/library_db", "root", "password");
@@ -37,7 +41,7 @@ public class StudentDAO {
                         rs.getString("author"),
                         rs.getString("category"),
                         rs.getString("type"),
-                        rs.getInt("availability_status")
+                        rs.getString("status")
                 ));
             }
         } catch (SQLException e) {
@@ -120,5 +124,41 @@ public class StudentDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    public static Student getStudentProfile(String admissionNo) {
+        String sql = "SELECT * FROM students WHERE admission_no = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, admissionNo);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Student(
+                        rs.getString("admission_no"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("phone_number")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static boolean updatePassword(String studentId, String newPassword) {
+        String sql = "UPDATE students SET password = ? WHERE admission_no = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, newPassword);
+            stmt.setString(2, studentId);
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

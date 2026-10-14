@@ -1,5 +1,9 @@
 package com.library.ui;
 
+import com.library.dao.UserDAO;
+import com.library.ui.AdminDashboard;
+import com.library.student.ui.StudentDashboard;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -140,7 +144,22 @@ public class LoginPage extends JFrame {
         loginBtn.setForeground(ThemeManager.TEXT_WHITE);
         loginBtn.setFont(ThemeManager.FONT_BOLD);
         loginBtn.setFocusPainted(false);
-        loginBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Logged into Student Portal successfully."));
+        loginBtn.addActionListener(e -> {
+            String admissionNo = studentIdField.getText().trim();
+            String password = new String(studentPassField.getPassword());
+
+            if (admissionNo.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter both admission number and password!");
+                return;
+            }
+
+            if (UserDAO.authenticateStudent(admissionNo, password)) {
+                dispose();
+                new StudentDashboard(admissionNo).setVisible(true); // <--- Passed admissionNo here
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid Admission Number or Password!");
+            }
+        });
         card.add(loginBtn, gbc);
 
         // Forgot Password
@@ -189,21 +208,29 @@ public class LoginPage extends JFrame {
         adminPassField = new JPasswordField(12);
         card.add(adminPassField, gbc);
 
-        // Login Button
+// Login Button
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
         JButton loginBtn = new JButton("Login as Admin");
         loginBtn.setBackground(ThemeManager.COLOR_NAVY_BG);
         loginBtn.setForeground(ThemeManager.TEXT_WHITE);
         loginBtn.setFont(ThemeManager.FONT_BOLD);
         loginBtn.setFocusPainted(false);
+
         loginBtn.addActionListener(e -> {
-            AdminDashboard dashboard = new AdminDashboard();
-            // Preserve full-screen / maximized state if active
-            if ((getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
-                dashboard.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            String adminId = adminIdField.getText().trim();
+            String password = new String(adminPassField.getPassword());
+
+            if (adminId.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter both Admin ID and Password.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            dashboard.setVisible(true);
-            dispose();
+
+            if (UserDAO.authenticateAdmin(adminId, password)) {
+                dispose();
+                new AdminDashboard().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid Admin ID or Password!", "Login Failed", JOptionPane.ERROR_MESSAGE);
+            }
         });
         card.add(loginBtn, gbc);
 

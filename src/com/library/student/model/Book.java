@@ -6,15 +6,15 @@ public class Book {
     private String author;
     private String category;
     private String type;
-    private int availabilityStatus;
+    private String status;
 
-    public Book(int bookId, String title, String author, String category, String type, int availabilityStatus) {
+    public Book(int bookId, String title, String author, String category, String type, String status) {
         this.bookId = bookId;
         this.title = title;
         this.author = author;
         this.category = category;
         this.type = type;
-        this.availabilityStatus = availabilityStatus;
+        this.status = status;
     }
 
     // Getters
@@ -23,5 +23,5 @@ public class Book {
     public String getAuthor() { return author; }
     public String getCategory() { return category; }
     public String getType() { return type; }
-    public int getAvailabilityStatus() { return availabilityStatus; }
+    public String getStatus() { return status; }
 }
