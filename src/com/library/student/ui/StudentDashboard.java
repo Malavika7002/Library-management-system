@@ -43,6 +43,33 @@ public class StudentDashboard extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // Root Container
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Top Header with Title & Logout Button
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(new Color(2, 36, 53));
+        headerPanel.setBorder(new EmptyBorder(10, 15, 10, 15));
+
+        JLabel headerTitle = new JLabel("STUDENT PORTAL");
+        headerTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        headerTitle.setForeground(Color.WHITE);
+
+        JButton logoutBtn = new JButton("Logout");
+        logoutBtn.setBackground(new Color(180, 40, 40));
+        logoutBtn.setForeground(Color.WHITE);
+        logoutBtn.setFocusPainted(false);
+        logoutBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        logoutBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        logoutBtn.addActionListener(e -> {
+            dispose(); // Close Student Dashboard
+            new com.library.ui.LoginPage().setVisible(true); // Open Login Window
+        });
+
+        headerPanel.add(headerTitle, BorderLayout.WEST);
+        headerPanel.add(logoutBtn, BorderLayout.EAST);
+
         // Styled Tabbed Pane
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setForeground(Color.WHITE);
@@ -52,9 +79,11 @@ public class StudentDashboard extends JFrame {
         tabbedPane.addTab(" My Borrowed Books ", createBorrowRecordsPanel());
         tabbedPane.addTab(" My Profile ", createProfilePanel(this.currentStudentId));
 
-        add(tabbedPane);
-    } // CLOSE THE CONSTRUCTOR HERE
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
+        add(mainPanel);
+    }
 private JPanel createSearchPanel() {
     JPanel panel = new JPanel(new BorderLayout(10, 10));
     panel.setBackground(new Color(2,36,53)); // Dark background
